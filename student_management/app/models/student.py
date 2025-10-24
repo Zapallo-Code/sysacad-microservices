@@ -19,12 +19,9 @@ class Student(models.Model):
         related_name="students",
     )
 
-    # Specialty is a model defined in another service, it will be commented on momentarily
-    # specialty = models.ForeignKey(
-    #    "Specialty",
-    #    on_delete=models.PROTECT,
-    #    related_name="students",
-    # )
+    specialty_id = models.IntegerField(
+        help_text="Store the specialty ID from the Specialty."
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
