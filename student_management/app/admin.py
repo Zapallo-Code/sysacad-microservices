@@ -27,49 +27,6 @@ class StudentAdmin(admin.ModelAdmin):
     date_hierarchy = "enrollment_date"
     readonly_fields = ("created_at", "updated_at", "full_name")
 
-    fieldsets = (
-        (
-            "Información Personal",
-            {
-                "fields": (
-                    "first_name",
-                    "last_name",
-                    "full_name",
-                    "birth_date",
-                    "gender",
-                )
-            },
-        ),
-        (
-            "Documentación",
-            {
-                "fields": (
-                    "document_type",
-                    "document_number",
-                )
-            },
-        ),
-        (
-            "Información Académica",
-            {
-                "fields": (
-                    "student_number",
-                    "enrollment_date",
-                )
-            },
-        ),
-        (
-            "Metadatos",
-            {
-                "fields": (
-                    "created_at",
-                    "updated_at",
-                ),
-                "classes": ("collapse",),
-            },
-        ),
-    )
-
 
 @admin.register(DocumentType)
 class DocumentTypeAdmin(admin.ModelAdmin):

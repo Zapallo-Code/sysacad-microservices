@@ -29,20 +29,6 @@ class DocumentTypeRepository:
             return None
 
     @staticmethod
-    def find_by_dni(dni: int) -> DocumentType | None:
-        try:
-            return DocumentType.objects.get(dni=dni)
-        except ObjectDoesNotExist:
-            return None
-
-    @staticmethod
-    def find_by_passport(passport: str) -> DocumentType | None:
-        try:
-            return DocumentType.objects.get(passport=passport)
-        except ObjectDoesNotExist:
-            return None
-
-    @staticmethod
     def update(document_type: DocumentType) -> DocumentType:
         document_type.full_clean()
         document_type.save()
@@ -59,10 +45,6 @@ class DocumentTypeRepository:
     @staticmethod
     def exists_by_id(id: int) -> bool:
         return DocumentType.objects.filter(id=id).exists()
-
-    @staticmethod
-    def exists_by_dni(dni: int) -> bool:
-        return DocumentType.objects.filter(dni=dni).exists()
 
     @staticmethod
     def count() -> int:
