@@ -11,103 +11,35 @@ class StudentViewSet(viewsets.ViewSet):
     serializer_class = StudentSerializer
 
     def list(self, request):
-        try:
             students = StudentService.find_all()
             serializer = self.serializer_class(students, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except Exception as e:
-            logger.error(f"Error listing students: {str(e)}")
-            return Response(
-                {"error": "Internal server error"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
+            return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
-        try:
             student = StudentService.find_by_id(int(pk))
             if student is None:
                 return Response(
                     {"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND
                 )
             serializer = self.serializer_class(student)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except ValueError:
-            return Response(
-                {"error": "Invalid ID format"}, status=status.HTTP_400_BAD_REQUEST
-            )
-        except Exception as e:
-            logger.error(f"Error retrieving student {pk}: {str(e)}")
-            return Response(
-                {"error": "Internal server error"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
+            return Response(serializer.data)
 
     def create(self, request):
-        try:
             serializer = self.serializer_class(data=request.data)
-            if not serializer.is_valid():
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+            serializer.is_valid(raise_exception=True)
             student = StudentService.create(serializer.validated_data)
             response_serializer = self.serializer_class(student)
             return Response(response_serializer.data, status=status.HTTP_201_CREATED)
-        except ValueError as e:
-            logger.warning(f"Validation error creating student: {str(e)}")
-            return Response(
-                {"error": str(e)},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        except Exception as e:
-            logger.error(f"Error creating student: {str(e)}")
-            return Response(
-                {"error": "Internal server error"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
+
 
     def update(self, request, pk=None):
-        try:
             serializer = self.serializer_class(data=request.data)
-            if not serializer.is_valid():
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+            serializer.is_valid(raise_exception=True)
             updated_student = StudentService.update(int(pk), serializer.validated_data)
-            if updated_student is None:
-                return Response(
-                    {"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND
-                )
-
             response_serializer = self.serializer_class(updated_student)
-            return Response(response_serializer.data, status=status.HTTP_200_OK)
-        except ValueError as e:
-            logger.warning(f"Validation error updating student {pk}: {str(e)}")
-            return Response(
-                {"error": str(e)},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        except Exception as e:
-            logger.error(f"Error updating student {pk}: {str(e)}")
-            return Response(
-                {"error": "Internal server error"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
+            return Response(response_serializer.data)
+
 
     def destroy(self, request, pk=None):
-        try:
-            student = StudentService.find_by_id(int(pk))
-            if student is None:
-                return Response(
-                    {"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND
-                )
-
             StudentService.delete_by_id(int(pk))
             return Response(status=status.HTTP_204_NO_CONTENT)
-        except ValueError:
-            return Response(
-                {"error": "Invalid ID format"}, status=status.HTTP_400_BAD_REQUEST
-            )
-        except Exception as e:
-            logger.error(f"Error deleting student {pk}: {str(e)}")
-            return Response(
-                {"error": "Internal server error"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
