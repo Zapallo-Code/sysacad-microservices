@@ -8,4 +8,20 @@ dependencies = [
     "django>=5.2.7",
     "djangorestframework>=3.16.1",
     "python-dotenv>=1.2.1",
+    "psycopg2-binary>=2.9.10",
 ]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-django>=4.8.0",
+    "pytest-cov>=4.1.0",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+testpaths = ["tests"]
