@@ -109,6 +109,14 @@ class StudentService:
                     f"Document number {document_number} is already registered"
                 )
 
+        document_type_id = student_data.get("document_type_id")
+        if document_type_id is not None and document_type_id != existing_student.document_type_id:
+            if not DocumentTypeRepository.exists_by_id(document_type_id):
+                logger.error(f"Document type with id {document_type_id} not found")
+                raise ValueError(
+                    f"Document type with id {document_type_id} does not exist"
+                )
+
         # TODO: Validate specialty_id when Specialty microservice is available
 
         for key, value in student_data.items():
