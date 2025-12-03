@@ -1,10 +1,7 @@
-import logging
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from app.serializers import StudentSerializer
 from app.services import StudentService
-
-logger = logging.getLogger(__name__)
 
 
 class StudentViewSet(viewsets.ViewSet):
