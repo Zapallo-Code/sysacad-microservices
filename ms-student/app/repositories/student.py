@@ -46,6 +46,14 @@ class StudentRepository:
         )
 
     @staticmethod
+    def find_by_specialty(specialty_id: int) -> List[Student]:
+        return list(
+            Student.objects.filter(specialty_id=specialty_id).select_related(
+                "document_type"
+            )
+        )
+
+    @staticmethod
     def search_by_name(name: str) -> List[Student]:
         return list(
             (
