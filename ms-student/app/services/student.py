@@ -1,5 +1,5 @@
-import datetime
 import logging
+from datetime import date
 from typing import Optional, List, Any
 from django.db import transaction
 from app.repositories import StudentRepository
@@ -133,26 +133,8 @@ class StudentService:
         return result
 
     @staticmethod
-    def calculate_age(student: Any) -> Optional[int]:
-        if not student or not student.birth_date:
-            logger.warning("Cannot calculate age: student or birth_date is None")
-            return None
-
-        today = datetime.date.today()
-        age = (
-            today.year
-            - student.birth_date.year
-            - (
-                (today.month, today.day)
-                < (student.birth_date.month, student.birth_date.day)
-            )
-        )
-        logger.debug(f"Calculated age for student {student.id}: {age}")
-        return age
-
-    @staticmethod
     def is_enrollment_valid(
-        birth_date: datetime.date, enrollment_date: datetime.date
+        birth_date: date, enrollment_date: date
     ) -> bool:
         if enrollment_date < birth_date:
             return False
