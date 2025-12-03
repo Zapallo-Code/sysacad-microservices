@@ -4,7 +4,6 @@ from rest_framework.pagination import PageNumberPagination
 from app.serializers import StudentSerializer
 from app.services import StudentService
 
-
 class StudentViewSet(viewsets.ViewSet):
     serializer_class = StudentSerializer
 
