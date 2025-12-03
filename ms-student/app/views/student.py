@@ -1,5 +1,6 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 from app.serializers import StudentSerializer
 from app.services import StudentService
 
@@ -9,8 +10,10 @@ class StudentViewSet(viewsets.ViewSet):
 
     def list(self, request):
             students = StudentService.find_all()
-            serializer = self.serializer_class(students, many=True)
-            return Response(serializer.data)
+            paginator = PageNumberPagination()
+            paginated_students = paginator.paginate_queryset(students, request)
+            serializer = self.serializer_class(paginated_students, many=True)
+            return paginator.get_paginated_response(serializer.data)
 
     def retrieve(self, request, pk=None):
             student = StudentService.find_by_id(int(pk))
