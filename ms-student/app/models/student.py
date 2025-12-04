@@ -31,25 +31,34 @@ class Student(models.Model):
         """Retorna el nombre completo del estudiante"""
         return f"{self.first_name} {self.last_name}"
 
-    @property
-    def age(self) -> int | None:
-        """Calcula la edad actual del estudiante"""
-        if not self.birth_date:
+    @staticmethod
+    def calculate_age(birth_date: date, reference_date: date = None) -> int | None:
+        """Calcula la edad basándose en una fecha de nacimiento y una fecha de referencia.
+        
+        Args:
+            birth_date: Fecha de nacimiento
+            reference_date: Fecha de referencia para calcular la edad (default: hoy)
+        
+        Returns:
+            Edad en años, o None si birth_date es None
+        """
+        if not birth_date:
             return None
-        today = date.today()
-        age = today.year - self.birth_date.year
-        if (today.month, today.day) < (self.birth_date.month, self.birth_date.day):
+        if reference_date is None:
+            reference_date = date.today()
+        age = reference_date.year - birth_date.year
+        if (reference_date.month, reference_date.day) < (birth_date.month, birth_date.day):
             age -= 1
         return age
 
+    @property
+    def age(self) -> int | None:
+        """Calcula la edad actual del estudiante"""
+        return Student.calculate_age(self.birth_date)
+
     def age_at_date(self, target_date: date) -> int | None:
         """Calcula la edad del estudiante en una fecha específica"""
-        if not self.birth_date:
-            return None
-        age = target_date.year - self.birth_date.year
-        if (target_date.month, target_date.day) < (self.birth_date.month, self.birth_date.day):
-            age -= 1
-        return age
+        return Student.calculate_age(self.birth_date, target_date)
 
     def __str__(self):
         return f"{self.last_name}, {self.first_name} - Student Number: {self.student_number}"

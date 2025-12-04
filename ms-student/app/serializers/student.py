@@ -2,7 +2,7 @@ from datetime import date, timedelta
 
 from rest_framework import serializers
 
-from app.models import Student
+from app.models.student import Student
 
 
 class StudentSerializer(serializers.ModelSerializer):
@@ -129,7 +129,7 @@ class StudentSerializer(serializers.ModelSerializer):
         if value > today:
             raise serializers.ValidationError("Birth date cannot be in the future.")
 
-        age = (today - value).days / 365.25
+        age = Student.calculate_age(value, today)
 
         if age < 10:
             raise serializers.ValidationError("Student must be at least 10 years old.")
@@ -179,7 +179,7 @@ class StudentSerializer(serializers.ModelSerializer):
                     {"enrollment_date": "Enrollment date cannot be before birth date."}
                 )
 
-            age_at_enrollment = (enrollment_date - birth_date).days / 365.25
+            age_at_enrollment = Student.calculate_age(birth_date, enrollment_date)
 
             if age_at_enrollment < 10:
                 raise serializers.ValidationError(

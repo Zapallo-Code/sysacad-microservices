@@ -1,5 +1,4 @@
 import logging
-from datetime import date
 from typing import Any
 
 from django.db import transaction
@@ -127,16 +126,4 @@ class StudentService:
         logger.info(f"Student with id {id} deleted successfully")
         return result
 
-    @staticmethod
-    def is_enrollment_valid(birth_date: date, enrollment_date: date) -> bool:
-        if enrollment_date < birth_date:
-            return False
 
-        age_at_enrollment = enrollment_date.year - birth_date.year
-        if (enrollment_date.month, enrollment_date.day) < (
-            birth_date.month,
-            birth_date.day,
-        ):
-            age_at_enrollment -= 1
-
-        return age_at_enrollment >= 16
