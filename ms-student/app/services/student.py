@@ -1,8 +1,8 @@
 import logging
-from typing import Any
 
 from django.db import transaction
 
+from app.models import Student
 from app.repositories import DocumentTypeRepository, StudentRepository
 
 logger = logging.getLogger(__name__)
@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class StudentService:
     @staticmethod
     @transaction.atomic
-    def create(student_data: dict) -> Any:
+    def create(student_data: dict) -> Student:
         logger.info(
             f"Creating student: {student_data.get('first_name')} {student_data.get('last_name')}"
         )
@@ -43,7 +43,7 @@ class StudentService:
         return created_student
 
     @staticmethod
-    def find_by_id(id: int) -> Any | None:
+    def find_by_id(id: int) -> Student | None:
         logger.info(f"Finding student with id: {id}")
         student = StudentRepository.find_by_id(id)
         if not student:
@@ -51,7 +51,7 @@ class StudentService:
         return student
 
     @staticmethod
-    def find_by_student_number(student_number: int) -> Any | None:
+    def find_by_student_number(student_number: int) -> Student | None:
         logger.info(f"Finding student with student number: {student_number}")
         student = StudentRepository.find_by_student_number(student_number)
         if not student:
@@ -59,14 +59,14 @@ class StudentService:
         return student
 
     @staticmethod
-    def find_all() -> list[Any]:
+    def find_all() -> list[Student]:
         logger.info("Finding all students")
         students = StudentRepository.find_all()
         logger.info(f"Found {len(students)} students")
         return students
 
     @staticmethod
-    def find_by_specialty(specialty_id: int) -> list[Any]:
+    def find_by_specialty(specialty_id: int) -> list[Student]:
         logger.info(f"Finding students by specialty id: {specialty_id}")
 
         # TODO: Validate specialty_id when Specialty microservice is available
@@ -77,7 +77,7 @@ class StudentService:
 
     @staticmethod
     @transaction.atomic
-    def update(id: int, student_data: dict) -> Any:
+    def update(id: int, student_data: dict) -> Student:
         logger.info(f"Updating student with id: {id}")
 
         existing_student = StudentRepository.find_by_id(id)
