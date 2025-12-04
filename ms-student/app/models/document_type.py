@@ -22,14 +22,14 @@ class DocumentType(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return self.get_name_display()
-
-    def __repr__(self):
-        return f"<DocumentType: {self.name}>"
-
     class Meta:
         db_table = "document_types"
         verbose_name = "Document Type"
         verbose_name_plural = "Document Types"
         ordering = ["name"]
+
+    def __str__(self):
+        return self.get_name_display()
+
+    def __repr__(self):
+        return f"<DocumentType: {self.name}>"
