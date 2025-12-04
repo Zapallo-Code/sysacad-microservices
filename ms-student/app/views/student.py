@@ -1,52 +1,10 @@
-from rest_framework import status, viewsets
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.response import Response
-
 from app.serializers import StudentSerializer
 from app.services import StudentService
+from app.views.base_viewset import BaseViewSet
 
 
-class StudentViewSet(viewsets.ViewSet):
+class StudentViewSet(BaseViewSet):
     serializer_class = StudentSerializer
-
-    def list(self, request):
-        students = StudentService.find_all()
-        paginator = PageNumberPagination()
-        paginated_students = paginator.paginate_queryset(students, request)
-        serializer = self.serializer_class(paginated_students, many=True)
-        return paginator.get_paginated_response(serializer.data)
-
-    def retrieve(self, request, pk=None):
-        student = StudentService.find_by_id(int(pk))
-        if student is None:
-            return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
-        serializer = self.serializer_class(student)
-        return Response(serializer.data)
-
-    def create(self, request):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        student = StudentService.create(serializer.validated_data)
-        response_serializer = self.serializer_class(student)
-        return Response(response_serializer.data, status=status.HTTP_201_CREATED)
-
-    def update(self, request, pk=None):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        updated_student = StudentService.update(int(pk), serializer.validated_data)
-        response_serializer = self.serializer_class(updated_student)
-        return Response(response_serializer.data)
-
-    def partial_update(self, request, pk=None):
-        student = StudentService.find_by_id(int(pk))
-        if student is None:
-            return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
-        serializer = self.serializer_class(student, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        updated_student = StudentService.update(int(pk), serializer.validated_data)
-        response_serializer = self.serializer_class(updated_student)
-        return Response(response_serializer.data)
-
-    def destroy(self, request, pk=None):
-        StudentService.delete_by_id(int(pk))
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    service_class = StudentService
+    entity_name = "Student"
+    paginate = True
