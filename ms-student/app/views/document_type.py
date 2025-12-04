@@ -36,6 +36,19 @@ class DocumentTypeViewSet(viewsets.ViewSet):
         response_serializer = self.serializer_class(updated_document_type)
         return Response(response_serializer.data)
 
+    def partial_update(self, request, pk=None):
+        document_type = DocumentTypeService.find_by_id(int(pk))
+        if document_type is None:
+            return Response(
+                {"error": "Document type not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        serializer = self.serializer_class(document_type, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        updated_document_type = DocumentTypeService.update(int(pk), serializer.validated_data)
+        response_serializer = self.serializer_class(updated_document_type)
+        return Response(response_serializer.data)
+
     def destroy(self, request, pk=None):
         DocumentTypeService.delete_by_id(int(pk))
         return Response(status=status.HTTP_204_NO_CONTENT)

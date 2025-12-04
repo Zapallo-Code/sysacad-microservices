@@ -38,7 +38,19 @@ class StudentViewSet(viewsets.ViewSet):
             response_serializer = self.serializer_class(updated_student)
             return Response(response_serializer.data)
 
+    def partial_update(self, request, pk=None):
+            student = StudentService.find_by_id(int(pk))
+            if student is None:
+                return Response(
+                    {"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND
+                )
+            serializer = self.serializer_class(student, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            updated_student = StudentService.update(int(pk), serializer.validated_data)
+            response_serializer = self.serializer_class(updated_student)
+            return Response(response_serializer.data)
 
     def destroy(self, request, pk=None):
             StudentService.delete_by_id(int(pk))
             return Response(status=status.HTTP_204_NO_CONTENT)
+    
