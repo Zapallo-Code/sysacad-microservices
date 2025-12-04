@@ -1,5 +1,5 @@
-from .student import StudentViewSet
-from .document_type import DocumentTypeViewSet
-from .health import health_check
+from .document_type import DocumentTypeViewSet as DocumentTypeViewSet
+from .health import health_check as health_check
+from .student import StudentViewSet as StudentViewSet
 
-_all_ = ["StudentViewSet", "DocumentTypeViewSet", "health_check"]
+__all__ = ["StudentViewSet", "DocumentTypeViewSet", "health_check"]

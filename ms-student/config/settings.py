@@ -1,10 +1,11 @@
 import os
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 load_dotenv()
 
-BASE_DIR = Path(_file_).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv(
     "SECRET_KEY", "django-insecure-(dz1*r0ihzs$9(#=$kpv7-1)mtop24&3!ac5a^^o1(-wjp-^m2"
@@ -148,14 +149,13 @@ if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = "DENY"
-    
+
     # CSRF trusted origins
     csrf_origins = os.getenv("CSRF_TRUSTED_ORIGINS", "")
     if csrf_origins:
         CSRF_TRUSTED_ORIGINS = csrf_origins.split(",")
-    
+
     # Remove BrowsableAPIRenderer in production
     REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = [
         "rest_framework.renderers.JSONRenderer",
     ]
-    
