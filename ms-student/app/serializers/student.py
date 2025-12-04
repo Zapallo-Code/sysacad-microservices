@@ -93,33 +93,22 @@ class StudentSerializer(serializers.ModelSerializer):
         },
     )
 
-    def validate_first_name(self, value):
+    def _validate_name(self, value, field_name):
         if not value or value.strip() == "":
-            raise serializers.ValidationError("First name cannot be only whitespace.")
-
+            raise serializers.ValidationError(f"{field_name} cannot be only whitespace.")
         if not value[0].isalpha():
-            raise serializers.ValidationError("First name must start with a letter.")
-
+            raise serializers.ValidationError(f"{field_name} must start with a letter.")
         if not value.replace(" ", "").replace("-", "").isalpha():
             raise serializers.ValidationError(
-                "First name must contain only letters, spaces, or hyphens."
+                f"{field_name} must contain only letters, spaces, or hyphens."
             )
-
         return value.strip().title()
+
+    def validate_first_name(self, value):
+        return self._validate_name(value, "First name")
 
     def validate_last_name(self, value):
-        if not value or value.strip() == "":
-            raise serializers.ValidationError("Last name cannot be only whitespace.")
-
-        if not value[0].isalpha():
-            raise serializers.ValidationError("Last name must start with a letter.")
-
-        if not value.replace(" ", "").replace("-", "").isalpha():
-            raise serializers.ValidationError(
-                "Last name must contain only letters, spaces, or hyphens."
-            )
-
-        return value.strip().title()
+        return self._validate_name(value, "Last name")
 
     def validate_document_number(self, value):
         if not value or value.strip() == "":
