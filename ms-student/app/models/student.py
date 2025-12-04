@@ -75,4 +75,5 @@ class Student(models.Model):
             models.Index(fields=["student_number"]),
             models.Index(fields=["document_number"]),
             models.Index(fields=["last_name", "first_name"]),
+            models.Index(fields=["specialty_id"]),
         ]
