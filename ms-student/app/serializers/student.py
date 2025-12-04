@@ -1,5 +1,7 @@
 from datetime import date, timedelta
+
 from rest_framework import serializers
+
 from app.models import Student
 
 
@@ -121,9 +123,7 @@ class StudentSerializer(serializers.ModelSerializer):
 
     def validate_document_number(self, value):
         if not value or value.strip() == "":
-            raise serializers.ValidationError(
-                "Document number cannot be only whitespace."
-            )
+            raise serializers.ValidationError("Document number cannot be only whitespace.")
 
         cleaned = value.strip().replace(".", "").replace("-", "").replace(" ", "")
 
@@ -169,17 +169,13 @@ class StudentSerializer(serializers.ModelSerializer):
 
     def validate_document_type_id(self, value):
         if value <= 0:
-            raise serializers.ValidationError(
-                "Document type ID must be a positive integer."
-            )
+            raise serializers.ValidationError("Document type ID must be a positive integer.")
 
         return value
 
     def validate_specialty_id(self, value):
         if value <= 0:
-            raise serializers.ValidationError(
-                "Specialty ID must be a positive integer."
-            )
+            raise serializers.ValidationError("Specialty ID must be a positive integer.")
 
         # TODO: Validate specialty exists when Specialty microservice is available
         return value
@@ -198,16 +194,12 @@ class StudentSerializer(serializers.ModelSerializer):
 
             if age_at_enrollment < 10:
                 raise serializers.ValidationError(
-                    {
-                        "enrollment_date": "Student must be at least 10 years old at enrollment."
-                    }
+                    {"enrollment_date": "Student must be at least 10 years old at enrollment."}
                 )
 
             if age_at_enrollment > 100:
                 raise serializers.ValidationError(
-                    {
-                        "enrollment_date": "Age at enrollment is unrealistic (more than 100 years)."
-                    }
+                    {"enrollment_date": "Age at enrollment is unrealistic (more than 100 years)."}
                 )
 
         return data

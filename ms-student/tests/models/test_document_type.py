@@ -1,15 +1,14 @@
-from django.test import TestCase
 from django.db import IntegrityError
+from django.test import TestCase
+
 from app.models import DocumentType
 
 
 class DocumentTypeModelTest(TestCase):
-
     def setUp(self):
         """Set up test data."""
         self.document_type = DocumentType.objects.create(
-            name="DNI",
-            description="Documento Nacional de Identidad"
+            name="DNI", description="Documento Nacional de Identidad"
         )
 
     def test_create_document_type(self):
@@ -26,26 +25,17 @@ class DocumentTypeModelTest(TestCase):
 
     def test_name_unique_constraint(self):
         with self.assertRaises(IntegrityError):
-            DocumentType.objects.create(
-                name="DNI",
-                description="Duplicate DNI"
-            )
+            DocumentType.objects.create(name="DNI", description="Duplicate DNI")
 
     def test_description_blank_allowed(self):
-        doc_type = DocumentType.objects.create(
-            name="LC",
-            description=""
-        )
+        doc_type = DocumentType.objects.create(name="LC", description="")
         self.assertEqual(doc_type.description, "")
 
     def test_valid_document_type_choices(self):
         valid_choices = ["DNI", "LC", "LE", "PASAPORTE"]
         for choice in valid_choices:
             if choice != "DNI":
-                doc_type = DocumentType.objects.create(
-                    name=choice,
-                    description=f"Test {choice}"
-                )
+                doc_type = DocumentType.objects.create(name=choice, description=f"Test {choice}")
                 self.assertEqual(doc_type.name, choice)
 
     def test_created_at_auto_now_add(self):
@@ -66,6 +56,5 @@ class DocumentTypeModelTest(TestCase):
 
     def test_get_name_display(self):
         self.assertEqual(
-            self.document_type.get_name_display(),
-            "DNI - Documento Nacional de Identidad"
+            self.document_type.get_name_display(), "DNI - Documento Nacional de Identidad"
         )

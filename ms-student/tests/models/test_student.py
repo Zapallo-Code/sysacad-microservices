@@ -1,15 +1,15 @@
 from datetime import date
-from django.test import TestCase
+
 from django.db import IntegrityError
-from app.models import Student, DocumentType
+from django.test import TestCase
+
+from app.models import DocumentType, Student
 
 
 class StudentModelTest(TestCase):
-
     def setUp(self):
         self.document_type = DocumentType.objects.create(
-            name="DNI",
-            description="Documento Nacional de Identidad"
+            name="DNI", description="Documento Nacional de Identidad"
         )
         self.student = Student.objects.create(
             first_name="Juan",
@@ -20,7 +20,7 @@ class StudentModelTest(TestCase):
             student_number=1001,
             enrollment_date=date(2023, 3, 1),
             document_type=self.document_type,
-            specialty_id=1
+            specialty_id=1,
         )
 
     def test_create_student(self):
@@ -56,12 +56,12 @@ class StudentModelTest(TestCase):
                 student_number=1001,
                 enrollment_date=date(2023, 3, 1),
                 document_type=self.document_type,
-                specialty_id=2
+                specialty_id=2,
             )
 
     def test_gender_choices(self):
         genders = [("M", "Male"), ("F", "Female"), ("O", "Other")]
-        for i, (gender_code, gender_name) in enumerate(genders):
+        for i, (gender_code, _gender_name) in enumerate(genders):
             student = Student.objects.create(
                 first_name=f"Test{i}",
                 last_name="Student",
@@ -71,7 +71,7 @@ class StudentModelTest(TestCase):
                 student_number=2000 + i,
                 enrollment_date=date(2023, 3, 1),
                 document_type=self.document_type,
-                specialty_id=1
+                specialty_id=1,
             )
             self.assertEqual(student.gender, gender_code)
 
@@ -81,6 +81,7 @@ class StudentModelTest(TestCase):
 
     def test_document_type_protect_on_delete(self):
         from django.db.models import ProtectedError
+
         with self.assertRaises(ProtectedError):
             self.document_type.delete()
 
@@ -110,7 +111,7 @@ class StudentModelTest(TestCase):
             student_number=1002,
             enrollment_date=date(2023, 3, 1),
             document_type=self.document_type,
-            specialty_id=1
+            specialty_id=1,
         )
         Student.objects.create(
             first_name="Carlos",
@@ -121,9 +122,9 @@ class StudentModelTest(TestCase):
             student_number=1003,
             enrollment_date=date(2023, 3, 1),
             document_type=self.document_type,
-            specialty_id=1
+            specialty_id=1,
         )
-        
+
         students = list(Student.objects.all())
         self.assertEqual(students[0].last_name, "Garcia")
         self.assertEqual(students[1].last_name, "Pérez")

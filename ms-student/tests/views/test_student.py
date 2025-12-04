@@ -1,17 +1,17 @@
 from datetime import date
+
 from django.test import TestCase
-from rest_framework.test import APIClient
 from rest_framework import status
-from app.models import Student, DocumentType
+from rest_framework.test import APIClient
+
+from app.models import DocumentType, Student
 
 
 class StudentViewSetTest(TestCase):
-
     def setUp(self):
         self.client = APIClient()
         self.document_type = DocumentType.objects.create(
-            name="DNI",
-            description="Documento Nacional de Identidad"
+            name="DNI", description="Documento Nacional de Identidad"
         )
         self.student = Student.objects.create(
             first_name="Juan",
@@ -22,7 +22,7 @@ class StudentViewSetTest(TestCase):
             student_number=1001,
             enrollment_date=date(2020, 3, 1),
             document_type=self.document_type,
-            specialty_id=1
+            specialty_id=1,
         )
         self.list_url = "/students/"
         self.detail_url = f"/students/{self.student.id}/"
@@ -35,7 +35,7 @@ class StudentViewSetTest(TestCase):
             "gender": "F",
             "student_number": 1002,
             "enrollment_date": "2020-03-01",
-            "specialty_id": 2
+            "specialty_id": 2,
         }
 
     def test_list_students(self):
@@ -106,7 +106,7 @@ class StudentViewSetTest(TestCase):
             "gender": "M",
             "student_number": 1001,
             "enrollment_date": "2020-03-01",
-            "specialty_id": 1
+            "specialty_id": 1,
         }
         response = self.client.put(self.detail_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -122,7 +122,7 @@ class StudentViewSetTest(TestCase):
             "gender": "M",
             "student_number": 1001,
             "enrollment_date": "2020-03-01",
-            "specialty_id": 1
+            "specialty_id": 1,
         }
         response = self.client.put(self.detail_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -137,7 +137,7 @@ class StudentViewSetTest(TestCase):
             student_number=9999,
             enrollment_date=date(2020, 1, 1),
             document_type=self.document_type,
-            specialty_id=1
+            specialty_id=1,
         )
         response = self.client.delete(f"/students/{student.id}/")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
@@ -160,9 +160,18 @@ class StudentViewSetTest(TestCase):
         response = self.client.get(self.detail_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         expected_fields = [
-            "id", "first_name", "last_name", "document_number",
-            "document_type_id", "birth_date", "gender", "student_number",
-            "enrollment_date", "specialty_id", "created_at", "updated_at"
+            "id",
+            "first_name",
+            "last_name",
+            "document_number",
+            "document_type_id",
+            "birth_date",
+            "gender",
+            "student_number",
+            "enrollment_date",
+            "specialty_id",
+            "created_at",
+            "updated_at",
         ]
         for field in expected_fields:
             self.assertIn(field, response.data)

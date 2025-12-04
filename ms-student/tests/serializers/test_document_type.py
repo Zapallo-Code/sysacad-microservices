@@ -1,10 +1,10 @@
 from django.test import TestCase
-from app.serializers import DocumentTypeSerializer
+
 from app.models import DocumentType
+from app.serializers import DocumentTypeSerializer
 
 
 class DocumentTypeSerializerTest(TestCase):
-
     def test_valid_data(self):
         data = {"name": "DNI", "description": "Documento Nacional de Identidad"}
         serializer = DocumentTypeSerializer(data=data)
@@ -53,8 +53,7 @@ class DocumentTypeSerializerTest(TestCase):
 
     def test_serialization(self):
         doc_type = DocumentType.objects.create(
-            name="DNI",
-            description="Documento Nacional de Identidad"
+            name="DNI", description="Documento Nacional de Identidad"
         )
         serializer = DocumentTypeSerializer(doc_type)
         self.assertEqual(serializer.data["name"], "DNI")
@@ -68,7 +67,7 @@ class DocumentTypeSerializerTest(TestCase):
             "name": "DNI",
             "id": 999,
             "created_at": "2020-01-01T00:00:00Z",
-            "updated_at": "2020-01-01T00:00:00Z"
+            "updated_at": "2020-01-01T00:00:00Z",
         }
         serializer = DocumentTypeSerializer(data=data)
         self.assertTrue(serializer.is_valid())

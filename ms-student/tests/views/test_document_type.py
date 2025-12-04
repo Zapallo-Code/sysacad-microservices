@@ -1,16 +1,15 @@
 from django.test import TestCase
-from rest_framework.test import APIClient
 from rest_framework import status
+from rest_framework.test import APIClient
+
 from app.models import DocumentType
 
 
 class DocumentTypeViewSetTest(TestCase):
-
     def setUp(self):
         self.client = APIClient()
         self.document_type = DocumentType.objects.create(
-            name="DNI",
-            description="Documento Nacional de Identidad"
+            name="DNI", description="Documento Nacional de Identidad"
         )
         self.list_url = "/document-types/"
         self.detail_url = f"/document-types/{self.document_type.id}/"

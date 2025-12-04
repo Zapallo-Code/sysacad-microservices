@@ -1,15 +1,15 @@
 from datetime import date, timedelta
+
 from django.test import TestCase
-from app.serializers import StudentSerializer
+
 from app.models import DocumentType
+from app.serializers import StudentSerializer
 
 
 class StudentSerializerTest(TestCase):
-
     def setUp(self):
         self.document_type = DocumentType.objects.create(
-            name="DNI",
-            description="Documento Nacional de Identidad"
+            name="DNI", description="Documento Nacional de Identidad"
         )
         self.valid_data = {
             "first_name": "Juan",
@@ -20,7 +20,7 @@ class StudentSerializerTest(TestCase):
             "gender": "M",
             "student_number": 1001,
             "enrollment_date": "2020-03-01",
-            "specialty_id": 1
+            "specialty_id": 1,
         }
 
     def test_valid_data(self):

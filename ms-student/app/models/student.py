@@ -1,4 +1,5 @@
 from datetime import date
+
 from django.db import models
 
 
@@ -20,9 +21,7 @@ class Student(models.Model):
         related_name="students",
     )
 
-    specialty_id = models.IntegerField(
-        help_text="Store the specialty ID from the Specialty."
-    )
+    specialty_id = models.IntegerField(help_text="Store the specialty ID from the Specialty.")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

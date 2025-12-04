@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Student, DocumentType
+from .models import DocumentType, Student
 
 
 @admin.register(Student)

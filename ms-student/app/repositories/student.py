@@ -1,25 +1,27 @@
-from typing import Optional, List, Dict, Any
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from typing import Any
+
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+
 from app.models import Student
 
 
 class StudentRepository:
     @staticmethod
-    def create(student_data: Dict[str, Any]) -> Student:
+    def create(student_data: dict[str, Any]) -> Student:
         student = Student(**student_data)
         student.full_clean()
         student.save()
         return student
 
     @staticmethod
-    def find_by_id(id: int) -> Optional[Student]:
+    def find_by_id(id: int) -> Student | None:
         try:
             return Student.objects.select_related("document_type").get(id=id)
         except ObjectDoesNotExist:
             return None
 
     @staticmethod
-    def find_by_student_number(student_number: int) -> Optional[Student]:
+    def find_by_student_number(student_number: int) -> Student | None:
         try:
             return Student.objects.select_related("document_type").get(
                 student_number=student_number
@@ -28,33 +30,27 @@ class StudentRepository:
             return None
 
     @staticmethod
-    def find_by_document_number(document_number: str) -> List[Student]:
+    def find_by_document_number(document_number: str) -> list[Student]:
         return list(
-            Student.objects.filter(document_number=document_number).select_related(
-                "document_type"
-            )
+            Student.objects.filter(document_number=document_number).select_related("document_type")
         )
 
     @staticmethod
-    def find_all() -> List[Student]:
+    def find_all() -> list[Student]:
         return list(Student.objects.select_related("document_type").all())
 
     @staticmethod
-    def find_by_gender(gender: str) -> List[Student]:
+    def find_by_gender(gender: str) -> list[Student]:
+        return list(Student.objects.filter(gender=gender).select_related("document_type"))
+
+    @staticmethod
+    def find_by_specialty(specialty_id: int) -> list[Student]:
         return list(
-            Student.objects.filter(gender=gender).select_related("document_type")
+            Student.objects.filter(specialty_id=specialty_id).select_related("document_type")
         )
 
     @staticmethod
-    def find_by_specialty(specialty_id: int) -> List[Student]:
-        return list(
-            Student.objects.filter(specialty_id=specialty_id).select_related(
-                "document_type"
-            )
-        )
-
-    @staticmethod
-    def search_by_name(name: str) -> List[Student]:
+    def search_by_name(name: str) -> list[Student]:
         return list(
             (
                 Student.objects.filter(first_name__icontains=name)

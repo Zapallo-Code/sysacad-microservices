@@ -1,15 +1,14 @@
 from django.test import TestCase
+
 from app.models import DocumentType
 from app.services import DocumentTypeService
 
 
 class DocumentTypeServiceTest(TestCase):
-
     def setUp(self):
         """Set up test data."""
         self.document_type = DocumentType.objects.create(
-            name="DNI",
-            description="Documento Nacional de Identidad"
+            name="DNI", description="Documento Nacional de Identidad"
         )
 
     def test_create_document_type(self):
@@ -44,8 +43,7 @@ class DocumentTypeServiceTest(TestCase):
 
     def test_update_document_type(self):
         updated = DocumentTypeService.update(
-            self.document_type.id,
-            {"description": "Updated description"}
+            self.document_type.id, {"description": "Updated description"}
         )
         self.assertEqual(updated.description, "Updated description")
 

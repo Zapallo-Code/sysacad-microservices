@@ -1,15 +1,15 @@
 from datetime import date
+
 from django.test import TestCase
-from app.models import Student, DocumentType
+
+from app.models import DocumentType, Student
 from app.services import StudentService
 
 
 class StudentServiceTest(TestCase):
-
     def setUp(self):
         self.document_type = DocumentType.objects.create(
-            name="DNI",
-            description="Documento Nacional de Identidad"
+            name="DNI", description="Documento Nacional de Identidad"
         )
         self.student_data = {
             "first_name": "Juan",
@@ -20,7 +20,7 @@ class StudentServiceTest(TestCase):
             "student_number": 1001,
             "enrollment_date": date(2020, 3, 1),
             "document_type_id": self.document_type.id,
-            "specialty_id": 1
+            "specialty_id": 1,
         }
         self.student = Student.objects.create(
             first_name="Existing",
@@ -31,7 +31,7 @@ class StudentServiceTest(TestCase):
             student_number=9000,
             enrollment_date=date(2020, 1, 1),
             document_type=self.document_type,
-            specialty_id=1
+            specialty_id=1,
         )
 
     def test_create_student(self):
@@ -84,10 +84,7 @@ class StudentServiceTest(TestCase):
         self.assertGreaterEqual(len(students), 1)
 
     def test_update_student(self):
-        updated = StudentService.update(
-            self.student.id,
-            {"first_name": "Updated"}
-        )
+        updated = StudentService.update(self.student.id, {"first_name": "Updated"})
         self.assertEqual(updated.first_name, "Updated")
 
     def test_update_non_existing_raises_error(self):
@@ -105,7 +102,7 @@ class StudentServiceTest(TestCase):
             student_number=9001,
             enrollment_date=date(2020, 1, 1),
             document_type=self.document_type,
-            specialty_id=1
+            specialty_id=1,
         )
         with self.assertRaises(ValueError) as context:
             StudentService.update(self.student.id, {"student_number": 9001})
@@ -121,7 +118,7 @@ class StudentServiceTest(TestCase):
             student_number=9002,
             enrollment_date=date(2020, 1, 1),
             document_type=self.document_type,
-            specialty_id=1
+            specialty_id=1,
         )
         with self.assertRaises(ValueError) as context:
             StudentService.update(self.student.id, {"document_number": "33333333"})
@@ -137,7 +134,7 @@ class StudentServiceTest(TestCase):
             student_number=9003,
             enrollment_date=date(2020, 1, 1),
             document_type=self.document_type,
-            specialty_id=1
+            specialty_id=1,
         )
         result = StudentService.delete_by_id(student.id)
         self.assertTrue(result)
@@ -178,16 +175,14 @@ class StudentServiceTest(TestCase):
 
     def test_update_same_student_number_allowed(self):
         updated = StudentService.update(
-            self.student.id,
-            {"student_number": 9000, "first_name": "Updated"}
+            self.student.id, {"student_number": 9000, "first_name": "Updated"}
         )
         self.assertEqual(updated.first_name, "Updated")
         self.assertEqual(updated.student_number, 9000)
 
     def test_update_same_document_number_allowed(self):
         updated = StudentService.update(
-            self.student.id,
-            {"document_number": "11111111", "first_name": "Updated"}
+            self.student.id, {"document_number": "11111111", "first_name": "Updated"}
         )
         self.assertEqual(updated.first_name, "Updated")
         self.assertEqual(updated.document_number, "11111111")

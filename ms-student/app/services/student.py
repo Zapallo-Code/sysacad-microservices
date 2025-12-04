@@ -1,9 +1,10 @@
 import logging
 from datetime import date
-from typing import Optional, List, Any
+from typing import Any
+
 from django.db import transaction
-from app.repositories import StudentRepository
-from app.repositories import DocumentTypeRepository
+
+from app.repositories import DocumentTypeRepository, StudentRepository
 
 logger = logging.getLogger(__name__)
 
@@ -16,19 +17,13 @@ class StudentService:
             f"Creating student: {student_data.get('first_name')} {student_data.get('last_name')}"
         )
 
-        if StudentRepository.exists_by_student_number(
-            student_data.get("student_number")
-        ):
-            logger.error(
-                f"Student number {student_data.get('student_number')} already exists"
-            )
+        if StudentRepository.exists_by_student_number(student_data.get("student_number")):
+            logger.error(f"Student number {student_data.get('student_number')} already exists")
             raise ValueError(
                 f"Student number {student_data.get('student_number')} is already taken"
             )
 
-        if StudentRepository.exists_by_document_number(
-            student_data.get("document_number")
-        ):
+        if StudentRepository.exists_by_document_number(student_data.get("document_number")):
             logger.error(
                 f"Document number {student_data.get('document_number')} already registered"
             )
@@ -38,12 +33,8 @@ class StudentService:
 
         # TODO: Validate specialty_id when Specialty microservice is available
 
-        if not DocumentTypeRepository.exists_by_id(
-            student_data.get("document_type_id")
-        ):
-            logger.error(
-                f"Document type with id {student_data.get('document_type_id')} not found"
-            )
+        if not DocumentTypeRepository.exists_by_id(student_data.get("document_type_id")):
+            logger.error(f"Document type with id {student_data.get('document_type_id')} not found")
             raise ValueError(
                 f"Document type with id {student_data.get('document_type_id')} does not exist"
             )
@@ -53,7 +44,7 @@ class StudentService:
         return created_student
 
     @staticmethod
-    def find_by_id(id: int) -> Optional[Any]:
+    def find_by_id(id: int) -> Any | None:
         logger.info(f"Finding student with id: {id}")
         student = StudentRepository.find_by_id(id)
         if not student:
@@ -61,7 +52,7 @@ class StudentService:
         return student
 
     @staticmethod
-    def find_by_student_number(student_number: int) -> Optional[Any]:
+    def find_by_student_number(student_number: int) -> Any | None:
         logger.info(f"Finding student with student number: {student_number}")
         student = StudentRepository.find_by_student_number(student_number)
         if not student:
@@ -69,14 +60,14 @@ class StudentService:
         return student
 
     @staticmethod
-    def find_all() -> List[Any]:
+    def find_all() -> list[Any]:
         logger.info("Finding all students")
         students = StudentRepository.find_all()
         logger.info(f"Found {len(students)} students")
         return students
 
     @staticmethod
-    def find_by_specialty(specialty_id: int) -> List[Any]:
+    def find_by_specialty(specialty_id: int) -> list[Any]:
         logger.info(f"Finding students by specialty id: {specialty_id}")
 
         # TODO: Validate specialty_id when Specialty microservice is available
@@ -105,17 +96,13 @@ class StudentService:
         if document_number and document_number != existing_student.document_number:
             if StudentRepository.exists_by_document_number(document_number):
                 logger.error(f"Document number {document_number} already registered")
-                raise ValueError(
-                    f"Document number {document_number} is already registered"
-                )
+                raise ValueError(f"Document number {document_number} is already registered")
 
         document_type_id = student_data.get("document_type_id")
         if document_type_id is not None and document_type_id != existing_student.document_type_id:
             if not DocumentTypeRepository.exists_by_id(document_type_id):
                 logger.error(f"Document type with id {document_type_id} not found")
-                raise ValueError(
-                    f"Document type with id {document_type_id} does not exist"
-                )
+                raise ValueError(f"Document type with id {document_type_id} does not exist")
 
         # TODO: Validate specialty_id when Specialty microservice is available
 
@@ -141,9 +128,7 @@ class StudentService:
         return result
 
     @staticmethod
-    def is_enrollment_valid(
-        birth_date: date, enrollment_date: date
-    ) -> bool:
+    def is_enrollment_valid(birth_date: date, enrollment_date: date) -> bool:
         if enrollment_date < birth_date:
             return False
 

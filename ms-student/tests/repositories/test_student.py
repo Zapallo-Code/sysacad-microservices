@@ -1,15 +1,15 @@
 from datetime import date
+
 from django.test import TestCase
-from app.models import Student, DocumentType
+
+from app.models import DocumentType, Student
 from app.repositories import StudentRepository
 
 
 class StudentRepositoryTest(TestCase):
-
     def setUp(self):
         self.document_type = DocumentType.objects.create(
-            name="DNI",
-            description="Documento Nacional de Identidad"
+            name="DNI", description="Documento Nacional de Identidad"
         )
         self.student = Student.objects.create(
             first_name="Juan",
@@ -20,7 +20,7 @@ class StudentRepositoryTest(TestCase):
             student_number=1001,
             enrollment_date=date(2023, 3, 1),
             document_type=self.document_type,
-            specialty_id=1
+            specialty_id=1,
         )
 
     def test_create_student(self):
@@ -33,7 +33,7 @@ class StudentRepositoryTest(TestCase):
             "student_number": 1002,
             "enrollment_date": date(2023, 3, 1),
             "document_type": self.document_type,
-            "specialty_id": 2
+            "specialty_id": 2,
         }
         student = StudentRepository.create(data)
         self.assertEqual(student.first_name, "María")
@@ -77,7 +77,7 @@ class StudentRepositoryTest(TestCase):
             student_number=1002,
             enrollment_date=date(2023, 3, 1),
             document_type=self.document_type,
-            specialty_id=2
+            specialty_id=2,
         )
         all_students = StudentRepository.find_all()
         self.assertEqual(len(all_students), 2)
@@ -92,7 +92,7 @@ class StudentRepositoryTest(TestCase):
             student_number=1002,
             enrollment_date=date(2023, 3, 1),
             document_type=self.document_type,
-            specialty_id=2
+            specialty_id=2,
         )
         males = StudentRepository.find_by_gender("M")
         females = StudentRepository.find_by_gender("F")
@@ -132,7 +132,7 @@ class StudentRepositoryTest(TestCase):
             student_number=9999,
             enrollment_date=date(2023, 3, 1),
             document_type=self.document_type,
-            specialty_id=1
+            specialty_id=1,
         )
         result = StudentRepository.delete_by_id(student.id)
         self.assertTrue(result)
@@ -171,7 +171,7 @@ class StudentRepositoryTest(TestCase):
             student_number=1003,
             enrollment_date=date(2023, 3, 1),
             document_type=self.document_type,
-            specialty_id=1
+            specialty_id=1,
         )
         self.assertEqual(StudentRepository.count(), initial_count + 1)
 

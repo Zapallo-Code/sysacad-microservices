@@ -1,15 +1,14 @@
 from django.test import TestCase
+
 from app.models import DocumentType
 from app.repositories import DocumentTypeRepository
 
 
 class DocumentTypeRepositoryTest(TestCase):
-
     def setUp(self):
         """Set up test data."""
         self.document_type = DocumentType.objects.create(
-            name="DNI",
-            description="Documento Nacional de Identidad"
+            name="DNI", description="Documento Nacional de Identidad"
         )
 
     def test_create_document_type(self):

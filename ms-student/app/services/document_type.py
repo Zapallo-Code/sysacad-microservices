@@ -1,5 +1,7 @@
 import logging
+
 from django.db import transaction
+
 from app.repositories import DocumentTypeRepository
 
 logger = logging.getLogger(__name__)
@@ -12,9 +14,7 @@ class DocumentTypeService:
         logger.info("Creating document type")
 
         created_document_type = DocumentTypeRepository.create(document_type_data)
-        logger.info(
-            f"Document type created successfully with id: {created_document_type.id}"
-        )
+        logger.info(f"Document type created successfully with id: {created_document_type.id}")
         return created_document_type
 
     @staticmethod

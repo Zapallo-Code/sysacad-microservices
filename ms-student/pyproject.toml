@@ -49,3 +49,8 @@ ignore = [
 
 [tool.ruff.lint.isort]
 known-first-party = ["app", "config"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14.8",
+]
