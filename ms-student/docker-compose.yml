@@ -26,6 +26,8 @@ services:
           - .env
       environment:
           - DB_HOST=postgres
+      ports:
+          - "8000:8000"
       networks:
           mired:
               aliases:
