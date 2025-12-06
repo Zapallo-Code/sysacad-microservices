@@ -1,5 +1,6 @@
 from datetime import date
 
+from django.core.validators import MinValueValidator
 from django.db import models
 
 
@@ -21,7 +22,14 @@ class Student(models.Model):
         related_name="students",
     )
 
-    specialty_id = models.IntegerField(help_text="Store the specialty ID from the Specialty.")
+    specialty_id = models.IntegerField(
+        validators=[MinValueValidator(1)],
+        help_text="Store the specialty ID from the Specialty microservice."
+    )
+
+    # Soft delete fields
+    is_active = models.BooleanField(default=True, db_index=True)
+    deleted_at = models.DateTimeField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -36,6 +44,7 @@ class Student(models.Model):
             models.Index(fields=["document_number"]),
             models.Index(fields=["last_name", "first_name"]),
             models.Index(fields=["specialty_id"]),
+            models.Index(fields=["is_active", "deleted_at"]),
         ]
 
     def __str__(self):
@@ -50,7 +59,6 @@ class Student(models.Model):
 
     @staticmethod
     def calculate_age(birth_date: date, reference_date: date = None) -> int | None:
-
         if not birth_date:
             return None
         if reference_date is None:
@@ -59,10 +67,3 @@ class Student(models.Model):
         if (reference_date.month, reference_date.day) < (birth_date.month, birth_date.day):
             age -= 1
         return age
-
-    @property
-    def age(self) -> int | None:
-        return Student.calculate_age(self.birth_date)
-
-    def age_at_date(self, target_date: date) -> int | None:
-        return Student.calculate_age(self.birth_date, target_date)

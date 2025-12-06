@@ -1,7 +1,9 @@
 import os
+import logging
 from pathlib import Path
 
 from dotenv import load_dotenv
+from pydantic import ValidationError
 
 load_dotenv()
 
@@ -123,11 +125,21 @@ REST_FRAMEWORK = {
 }
 
 
-# Django cache configuration
+# Django cache configuration - Redis for distributed caching
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-        "LOCATION": "unique-snowflake",
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": f"redis://{os.getenv('REDIS_HOST', 'redis')}:{os.getenv('REDIS_PORT', '6379')}/0",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "CONNECTION_POOL_KWARGS": {"max_connections": 50},
+            "SOCKET_CONNECT_TIMEOUT": 5,
+            "SOCKET_TIMEOUT": 5,
+            "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
+            "IGNORE_EXCEPTIONS": False,
+        },
+        "KEY_PREFIX": "sysacad",
+        "TIMEOUT": 300,  # 5 minutes default TTL
     }
 }
 
@@ -140,6 +152,42 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Logging configuration with JSON formatting
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "json": {
+            "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
+            "fmt": "%(timestamp)s %(level)s %(name)s %(message)s %(exc_info)s",
+        },
+        "verbose": {
+            "format": "{levelname} {asctime} {name} {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "json" if not DEBUG else "verbose",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
+        },
+        "app": {
+            "handlers": ["console"],
+            "level": os.getenv("APP_LOG_LEVEL", "INFO"),
+        },
+        "requests": {
+            "handlers": ["console"],
+            "level": os.getenv("REQUESTS_LOG_LEVEL", "WARNING"),
+        },
+    },
+}
 
 # Security settings for production
 if not DEBUG:

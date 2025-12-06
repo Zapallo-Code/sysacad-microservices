@@ -9,8 +9,14 @@ class BaseViewSet(viewsets.ViewSet):
     entity_name = "Entity"
     paginate = False
 
+    def get_service(self):
+        """Instancia el service con dependency injection."""
+        if not hasattr(self, '_service_instance'):
+            self._service_instance = self.service_class()
+        return self._service_instance
+
     def list(self, request):
-        entities = self.service_class.find_all()
+        entities = self.get_service().find_all()
         if self.paginate:
             paginator = PageNumberPagination()
             paginated_entities = paginator.paginate_queryset(entities, request)
@@ -20,7 +26,7 @@ class BaseViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
-        entity = self.service_class.find_by_id(int(pk))
+        entity = self.get_service().find_by_id(int(pk))
         if entity is None:
             return Response(
                 {"error": f"{self.entity_name} not found"},
@@ -32,19 +38,26 @@ class BaseViewSet(viewsets.ViewSet):
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        entity = self.service_class.create(serializer.validated_data)
-        response_serializer = self.serializer_class(entity)
-        return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+        entity = self.get_service().create(serializer.validated_data)
+        return Response(
+            self.serializer_class(entity).data,
+            status=status.HTTP_201_CREATED
+        )
 
     def update(self, request, pk=None):
-        serializer = self.serializer_class(data=request.data)
+        entity = self.get_service().find_by_id(int(pk))
+        if entity is None:
+            return Response(
+                {"error": f"{self.entity_name} not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        serializer = self.serializer_class(entity, data=request.data)
         serializer.is_valid(raise_exception=True)
-        updated_entity = self.service_class.update(int(pk), serializer.validated_data)
-        response_serializer = self.serializer_class(updated_entity)
-        return Response(response_serializer.data)
+        updated_entity = self.get_service().update(int(pk), serializer.validated_data)
+        return Response(self.serializer_class(updated_entity).data)
 
     def partial_update(self, request, pk=None):
-        entity = self.service_class.find_by_id(int(pk))
+        entity = self.get_service().find_by_id(int(pk))
         if entity is None:
             return Response(
                 {"error": f"{self.entity_name} not found"},
@@ -52,10 +65,14 @@ class BaseViewSet(viewsets.ViewSet):
             )
         serializer = self.serializer_class(entity, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        updated_entity = self.service_class.update(int(pk), serializer.validated_data)
-        response_serializer = self.serializer_class(updated_entity)
-        return Response(response_serializer.data)
+        updated_entity = self.get_service().update(int(pk), serializer.validated_data)
+        return Response(self.serializer_class(updated_entity).data)
 
     def destroy(self, request, pk=None):
-        self.service_class.delete_by_id(int(pk))
+        result = self.get_service().delete_by_id(int(pk))
+        if not result:
+            return Response(
+                {"error": f"{self.entity_name} not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
         return Response(status=status.HTTP_204_NO_CONTENT)
