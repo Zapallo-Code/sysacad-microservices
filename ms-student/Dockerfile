@@ -23,6 +23,7 @@ RUN uv sync --locked --no-dev
 
 COPY --chown=djangoapp:djangoapp ./app ./app
 COPY --chown=djangoapp:djangoapp ./config ./config
+COPY --chown=djangoapp:djangoapp ./tests ./tests
 COPY --chown=djangoapp:djangoapp ./manage.py .
 
 EXPOSE 8000
