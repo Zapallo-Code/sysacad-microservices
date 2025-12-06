@@ -1,4 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
+
 from app.models import DocumentType
 
 
@@ -18,8 +19,8 @@ class DocumentTypeRepository:
             return None
 
     @staticmethod
-    def find_all() -> list[DocumentType]:
-        return list(DocumentType.objects.all())
+    def find_all():
+        return DocumentType.objects.all()
 
     @staticmethod
     def find_by_name(name: str) -> DocumentType | None:
@@ -45,7 +46,3 @@ class DocumentTypeRepository:
     @staticmethod
     def exists_by_id(id: int) -> bool:
         return DocumentType.objects.filter(id=id).exists()
-
-    @staticmethod
-    def count() -> int:
-        return DocumentType.objects.count()

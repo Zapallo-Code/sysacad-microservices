@@ -1,58 +1,49 @@
-from typing import Optional, List, Dict, Any
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from typing import Any
+
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+from django.db.models import QuerySet
+from django.utils import timezone
+
 from app.models import Student
 
 
 class StudentRepository:
     @staticmethod
-    def create(student_data: Dict[str, Any]) -> Student:
+    def _get_active_queryset() -> QuerySet[Student]:
+        return Student.objects.filter(is_active=True, deleted_at__isnull=True)
+
+    @staticmethod
+    def create(student_data: dict[str, Any]) -> Student:
         student = Student(**student_data)
         student.full_clean()
         student.save()
         return student
 
     @staticmethod
-    def find_by_id(id: int) -> Optional[Student]:
+    def find_by_id(id: int) -> Student | None:
         try:
-            return Student.objects.select_related("document_type").get(id=id)
+            return StudentRepository._get_active_queryset().select_related("document_type").get(id=id)
         except ObjectDoesNotExist:
             return None
 
     @staticmethod
-    def find_by_student_number(student_number: int) -> Optional[Student]:
+    def find_by_student_number(student_number: int) -> Student | None:
         try:
-            return Student.objects.select_related("document_type").get(
+            return StudentRepository._get_active_queryset().select_related("document_type").get(
                 student_number=student_number
             )
         except (ObjectDoesNotExist, MultipleObjectsReturned):
             return None
 
     @staticmethod
-    def find_by_document_number(document_number: str) -> List[Student]:
-        return list(
-            Student.objects.filter(document_number=document_number).select_related(
-                "document_type"
-            )
-        )
+    def find_all() -> QuerySet[Student]:
+        return StudentRepository._get_active_queryset().select_related("document_type")
 
     @staticmethod
-    def find_all() -> List[Student]:
-        return list(Student.objects.select_related("document_type").all())
-
-    @staticmethod
-    def find_by_gender(gender: str) -> List[Student]:
-        return list(
-            Student.objects.filter(gender=gender).select_related("document_type")
-        )
-
-    @staticmethod
-    def search_by_name(name: str) -> List[Student]:
-        return list(
-            (
-                Student.objects.filter(first_name__icontains=name)
-                | Student.objects.filter(last_name__icontains=name)
-            ).select_related("document_type")
-        )
+    def find_by_specialty(specialty_id: int) -> QuerySet[Student]:
+        return StudentRepository._get_active_queryset().filter(
+            specialty_id=specialty_id
+        ).select_related("document_type")
 
     @staticmethod
     def update(student: Student) -> Student:
@@ -62,24 +53,23 @@ class StudentRepository:
 
     @staticmethod
     def delete_by_id(id: int) -> bool:
-        student = StudentRepository.find_by_id(id)
-        if not student:
+        try:
+            student = Student.objects.get(id=id)
+            student.is_active = False
+            student.deleted_at = timezone.now()
+            student.save()
+            return True
+        except ObjectDoesNotExist:
             return False
-        student.delete()
-        return True
 
     @staticmethod
     def exists_by_id(id: int) -> bool:
-        return Student.objects.filter(id=id).exists()
+        return StudentRepository._get_active_queryset().filter(id=id).exists()
 
     @staticmethod
     def exists_by_student_number(student_number: int) -> bool:
-        return Student.objects.filter(student_number=student_number).exists()
+        return StudentRepository._get_active_queryset().filter(student_number=student_number).exists()
 
     @staticmethod
     def exists_by_document_number(document_number: str) -> bool:
-        return Student.objects.filter(document_number=document_number).exists()
-
-    @staticmethod
-    def count() -> int:
-        return Student.objects.count()
+        return StudentRepository._get_active_queryset().filter(document_number=document_number).exists()

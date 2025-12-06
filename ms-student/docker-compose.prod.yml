@@ -2,20 +2,17 @@ services:
   postgres:
       image: postgres:latest
       env_file:
-          - .env
-      environment:
-          - POSTGRES_DB=${DB_NAME}
-          - POSTGRES_USER=${DB_USER}
-          - POSTGRES_PASSWORD=${DB_PASSWORD}
+          - .env.prod
       volumes:
-          - postgres_data:/var/lib/postgresql
+          - postgres_prod_data:/var/lib/postgresql
       networks:
           - mired
       healthcheck:
-          test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+          test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
           interval: 10s
           timeout: 5s
           retries: 5
+      restart: unless-stopped
 
   redis:
       image: redis:7-alpine
@@ -27,6 +24,9 @@ services:
           timeout: 5s
           retries: 5
       command: redis-server --appendonly yes
+      restart: unless-stopped
+      volumes:
+          - redis_prod_data:/data
 
   alumnos-service:
       build: .
@@ -36,13 +36,9 @@ services:
           redis:
               condition: service_healthy
       env_file:
-          - .env
+          - .env.prod
       environment:
           - DB_HOST=postgres
-      ports:
-          - "8000:8000"
-      volumes:
-          - ./app:/home/djangoapp/app
       networks:
           mired:
               aliases:
@@ -50,24 +46,35 @@ services:
       labels:
           - "traefik.enable=true"
           - "traefik.docker.network=mired"
-          # Router configuration
+          # Router configuration - HTTP
+          - "traefik.http.routers.alumnos-service-http.rule=Host(`alumnos.universidad.localhost`)"
+          - "traefik.http.routers.alumnos-service-http.entrypoints=http"
+          - "traefik.http.routers.alumnos-service-http.middlewares=alumnos-cb,alumnos-retry,alumnos-ratelimit"
+          # Router configuration - HTTPS
           - "traefik.http.routers.alumnos-service.rule=Host(`alumnos.universidad.localhost`)"
           - "traefik.http.routers.alumnos-service.entrypoints=https"
           - "traefik.http.routers.alumnos-service.tls=true"
-          - "traefik.http.routers.alumnos-service.middlewares=alumnos-cb,alumnos-retry"
-          # Service configuration
+          - "traefik.http.routers.alumnos-service.middlewares=alumnos-cb,alumnos-retry,alumnos-ratelimit"
+            # Service configuration
           - "traefik.http.services.alumnos-service.loadbalancer.server.port=8000"
           - "traefik.http.services.alumnos-service.loadbalancer.healthcheck.path=/health/"
           - "traefik.http.services.alumnos-service.loadbalancer.healthcheck.interval=10s"
-          # Circuit Breaker middleware
+          - "traefik.http.services.alumnos-service.loadbalancer.sticky.cookie=true"
+          - "traefik.http.services.alumnos-service.loadbalancer.sticky.cookie.name=alumnos_sticky"
+            # Circuit Breaker middleware
           - "traefik.http.middlewares.alumnos-cb.circuitbreaker.expression=ResponseCodeRatio(500, 600, 0, 600) > 0.25 || NetworkErrorRatio() > 0.5"
-          # Retry middleware
+            # Retry middleware
           - "traefik.http.middlewares.alumnos-retry.retry.attempts=4"
           - "traefik.http.middlewares.alumnos-retry.retry.initialinterval=100ms"
+            # Rate Limit middleware
+          - "traefik.http.middlewares.alumnos-ratelimit.ratelimit.average=100"
+          - "traefik.http.middlewares.alumnos-ratelimit.ratelimit.burst=50"
+      restart: unless-stopped
 
 volumes:
-    postgres_data:
+    postgres_prod_data:
+    redis_prod_data:
 
 networks:
     mired:
-       external: true
+      external: true
