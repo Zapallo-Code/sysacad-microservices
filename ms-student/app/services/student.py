@@ -17,44 +17,32 @@ class StudentService:
         document_type_repository: DocumentTypeRepository = None,
         academic_client: AcademicServiceClient = None
     ):
-        """Inicializa el servicio con sus dependencias.
-        
-        Args:
-            student_repository: Repository para estudiantes (default: StudentRepository)
-            document_type_repository: Repository para tipos de documento (default: DocumentTypeRepository)
-            academic_client: Cliente del servicio académico (default: academic_service_client singleton)
-        """
-        self.student_repository = student_repository or StudentRepository
-        self.document_type_repository = document_type_repository or DocumentTypeRepository
+        self.student_repository = student_repository or StudentRepository()
+        self.document_type_repository = document_type_repository or DocumentTypeRepository()
         self.academic_client = academic_client or academic_service_client
 
     def _validate_unique_student_number(self, student_number: int, exclude_id: int = None):
-        """Valida que el student_number sea único."""
         existing = self.student_repository.find_by_student_number(student_number)
         if existing and (exclude_id is None or existing.id != exclude_id):
             logger.error(f"Student number {student_number} already exists")
             raise ValueError(f"Student number {student_number} is already taken")
 
     def _validate_unique_document_number(self, document_number: str, exclude_id: int = None):
-        """Valida que el document_number sea único."""
         if self.student_repository.exists_by_document_number(document_number):
             logger.error(f"Document number {document_number} already registered")
             raise ValueError(f"Document number {document_number} is already registered")
 
     def _validate_specialty_exists(self, specialty_id: int):
-        """Valida que la especialidad exista en el microservicio académico."""
         if not self.academic_client.validate_specialty(specialty_id):
             logger.error(f"Specialty {specialty_id} not found in academic service")
             raise ValueError(f"Specialty with id {specialty_id} does not exist")
 
     def _validate_document_type_exists(self, document_type_id: int):
-        """Valida que el tipo de documento exista."""
         if not self.document_type_repository.exists_by_id(document_type_id):
             logger.error(f"Document type with id {document_type_id} not found")
             raise ValueError(f"Document type with id {document_type_id} does not exist")
 
     def _update_entity_fields(self, entity, data: dict):
-        """Actualiza campos de una entidad con los datos proporcionados."""
         for key, value in data.items():
             if hasattr(entity, key):
                 setattr(entity, key, value)
@@ -76,7 +64,6 @@ class StudentService:
         return student
 
     def find_by_id(self, id: int) -> Student | None:
-        """Obtiene estudiante por ID con caché."""
         cache_key = f"student:{id}"
         cached = cache.get(cache_key)
         if cached:
@@ -92,7 +79,7 @@ class StudentService:
         return self.student_repository.find_by_student_number(student_number)
 
     def find_all(self) -> list[Student]:
-        """Obtiene todos los estudiantes con caché."""
+
         cache_key = "students:all"
         cached = cache.get(cache_key)
         if cached:
@@ -147,5 +134,3 @@ class StudentService:
         cache.delete(f"student:{id}")
         cache.delete("students:all")
         return result
-
-

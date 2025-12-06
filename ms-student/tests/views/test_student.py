@@ -24,8 +24,8 @@ class StudentViewSetTest(TestCase):
             document_type=self.document_type,
             specialty_id=1,
         )
-        self.list_url = "/students/"
-        self.detail_url = f"/students/{self.student.id}/"
+        self.list_url = "/api/v1/students/"
+        self.detail_url = f"/api/v1/students/{self.student.id}/"
         self.valid_data = {
             "first_name": "María",
             "last_name": "García",
@@ -139,7 +139,7 @@ class StudentViewSetTest(TestCase):
             document_type=self.document_type,
             specialty_id=1,
         )
-        response = self.client.delete(f"/students/{student.id}/")
+        response = self.client.delete(f"/api/v1/students/{student.id}/")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_create_student_birth_date_future(self):
@@ -177,9 +177,9 @@ class StudentViewSetTest(TestCase):
             self.assertIn(field, response.data)
 
     def test_students_url_exists(self):
-        response = self.client.get("/students/")
+        response = self.client.get("/api/v1/students/")
         self.assertNotEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_students_detail_url_format(self):
-        response = self.client.get(f"/students/{self.student.id}/")
+        response = self.client.get(f"/api/v1/students/{self.student.id}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)

@@ -46,7 +46,11 @@ services:
       labels:
           - "traefik.enable=true"
           - "traefik.docker.network=mired"
-          # Router configuration
+          # Router configuration - HTTP
+          - "traefik.http.routers.alumnos-service-http.rule=Host(`alumnos.universidad.localhost`)"
+          - "traefik.http.routers.alumnos-service-http.entrypoints=http"
+          - "traefik.http.routers.alumnos-service-http.middlewares=alumnos-cb,alumnos-retry,alumnos-ratelimit"
+          # Router configuration - HTTPS
           - "traefik.http.routers.alumnos-service.rule=Host(`alumnos.universidad.localhost`)"
           - "traefik.http.routers.alumnos-service.entrypoints=https"
           - "traefik.http.routers.alumnos-service.tls=true"

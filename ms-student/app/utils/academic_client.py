@@ -8,7 +8,6 @@ logger = logging.getLogger(__name__)
 
 
 class AcademicServiceClient:
-    """Cliente HTTP para comunicarse con el microservicio académico."""
 
     BASE_URL = os.getenv("ACADEMIC_SERVICE_URL", "http://academico.universidad.localhost")
     TIMEOUT = int(os.getenv("ACADEMIC_SERVICE_TIMEOUT", "5"))
@@ -22,20 +21,6 @@ class AcademicServiceClient:
     )
 
     def validate_specialty(self, specialty_id: int) -> bool:
-        """
-        Valida que una especialidad existe en el microservicio académico.
-        
-        Args:
-            specialty_id: ID de la especialidad a validar
-            
-        Returns:
-            True si la especialidad existe, False en caso contrario
-            
-        Raises:
-            requests.Timeout: Si el servicio no responde a tiempo
-            requests.ConnectionError: Si no se puede conectar al servicio
-            requests.HTTPError: Si el servicio devuelve un error HTTP
-        """
         try:
             return self.breaker.call(self._call_validate_specialty, specialty_id)
         except Exception as e:
@@ -43,7 +28,6 @@ class AcademicServiceClient:
             raise
 
     def _call_validate_specialty(self, specialty_id: int) -> bool:
-        """Internal method to validate specialty (called by circuit breaker)."""
         try:
             url = f"{self.BASE_URL}/especialidades/{specialty_id}"
             response = requests.get(url, timeout=self.TIMEOUT)
@@ -60,7 +44,6 @@ class AcademicServiceClient:
             raise
 
     def get_specialty(self, specialty_id: int) -> dict | None:
-        """Obtiene los detalles de una especialidad."""
         try:
             return self.breaker.call(self._call_get_specialty, specialty_id)
         except Exception as e:
@@ -68,7 +51,6 @@ class AcademicServiceClient:
             return None
 
     def _call_get_specialty(self, specialty_id: int) -> dict | None:
-        """Internal method to get specialty (called by circuit breaker)."""
         try:
             url = f"{self.BASE_URL}/especialidades/{specialty_id}"
             response = requests.get(url, timeout=self.TIMEOUT)

@@ -11,12 +11,7 @@ logger = logging.getLogger(__name__)
 
 class DocumentTypeService:
     def __init__(self, repository: DocumentTypeRepository = None):
-        """Inicializa el servicio con su repositorio.
-        
-        Args:
-            repository: Repository para tipos de documento (default: DocumentTypeRepository)
-        """
-        self.repository = repository or DocumentTypeRepository
+        self.repository = repository or DocumentTypeRepository()
 
     @transaction.atomic
     def create(self, document_type_data: dict) -> DocumentType:
@@ -26,7 +21,6 @@ class DocumentTypeService:
         return doc_type
 
     def find_by_id(self, id: int) -> DocumentType | None:
-        """Obtiene tipo de documento por ID con caché."""
         cache_key = f"document_type:{id}"
         cached = cache.get(cache_key)
         if cached:
@@ -42,7 +36,6 @@ class DocumentTypeService:
         return self.repository.find_by_name(name)
 
     def find_all(self) -> list[DocumentType]:
-        """Obtiene todos los tipos de documento con caché."""
         cache_key = "document_types:all"
         cached = cache.get(cache_key)
         if cached:
@@ -54,7 +47,6 @@ class DocumentTypeService:
         return doc_types
 
     def _update_entity_fields(self, entity, data: dict):
-        """Actualiza campos de una entidad con los datos proporcionados."""
         for key, value in data.items():
             if hasattr(entity, key):
                 setattr(entity, key, value)

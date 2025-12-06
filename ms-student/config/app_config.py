@@ -1,11 +1,8 @@
-"""Pydantic configuration validator for environment variables."""
-
 import os
 from pydantic import BaseSettings, Field, validator
 
 
 class AppSettings(BaseSettings):
-    """Application settings with validation."""
     
     # Django
     SECRET_KEY: str = Field(

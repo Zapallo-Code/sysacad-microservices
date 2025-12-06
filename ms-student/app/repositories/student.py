@@ -10,7 +10,6 @@ from app.models import Student
 class StudentRepository:
     @staticmethod
     def _get_active_queryset() -> QuerySet[Student]:
-        """Devuelve QuerySet de estudiantes activos (no soft-deleted)."""
         return Student.objects.filter(is_active=True, deleted_at__isnull=True)
 
     @staticmethod
@@ -54,7 +53,6 @@ class StudentRepository:
 
     @staticmethod
     def delete_by_id(id: int) -> bool:
-        """Soft delete: marca como inactivo en lugar de eliminar."""
         try:
             student = Student.objects.get(id=id)
             student.is_active = False

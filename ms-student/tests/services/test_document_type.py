@@ -6,7 +6,6 @@ from app.services import DocumentTypeService
 
 @pytest.fixture
 def document_type(db):
-    """Create a test document type."""
     return DocumentType.objects.create(
         name="DNI", description="Documento Nacional de Identidad"
     )
@@ -14,7 +13,6 @@ def document_type(db):
 
 @pytest.fixture
 def document_type_service():
-    """Create a DocumentTypeService instance."""
     return DocumentTypeService()
 
 

@@ -10,7 +10,6 @@ class BaseViewSet(viewsets.ViewSet):
     paginate = False
 
     def get_service(self):
-        """Instancia el service con dependency injection."""
         if not hasattr(self, '_service_instance'):
             self._service_instance = self.service_class()
         return self._service_instance

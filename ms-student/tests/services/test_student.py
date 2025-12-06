@@ -9,7 +9,6 @@ from app.services import StudentService
 
 @pytest.fixture
 def document_type(db):
-    """Create a test document type."""
     return DocumentType.objects.create(
         name="DNI", description="Documento Nacional de Identidad"
     )
@@ -17,7 +16,6 @@ def document_type(db):
 
 @pytest.fixture
 def student_data(document_type):
-    """Create sample student data."""
     return {
         "first_name": "Juan",
         "last_name": "Pérez",
@@ -33,7 +31,6 @@ def student_data(document_type):
 
 @pytest.fixture
 def existing_student(db, document_type):
-    """Create an existing student for tests."""
     return Student.objects.create(
         first_name="Existing",
         last_name="Student",
@@ -49,7 +46,6 @@ def existing_student(db, document_type):
 
 @pytest.fixture
 def student_service():
-    """Create a StudentService instance with mocked academic client."""
     mock_academic_client = Mock()
     mock_academic_client.validate_specialty.return_value = True
     return StudentService(academic_client=mock_academic_client)

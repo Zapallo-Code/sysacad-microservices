@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from .views import DocumentTypeViewSet, StudentViewSet, health_check
@@ -9,4 +9,5 @@ router.register(r"document-types", DocumentTypeViewSet, basename="document-type"
 
 urlpatterns = [
     path("health/", health_check, name="health-check"),
-] + router.urls
+    path("api/v1/", include(router.urls)),
+]
