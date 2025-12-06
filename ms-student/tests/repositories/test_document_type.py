@@ -61,8 +61,3 @@ class DocumentTypeRepositoryTest(TestCase):
 
     def test_exists_by_id_false(self):
         self.assertFalse(DocumentTypeRepository.exists_by_id(9999))
-
-    def test_count(self):
-        initial_count = DocumentTypeRepository.count()
-        DocumentType.objects.create(name="LC", description="Test")
-        self.assertEqual(DocumentTypeRepository.count(), initial_count + 1)

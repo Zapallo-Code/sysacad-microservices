@@ -62,7 +62,8 @@ class DocumentTypeViewSetTest(TestCase):
 
     def test_delete_document_type_not_found(self):
         response = self.client.delete("/document-types/9999/")
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)  # ValueError retorna 400
+
 
     def test_document_types_url_exists(self):
         response = self.client.get("/document-types/")

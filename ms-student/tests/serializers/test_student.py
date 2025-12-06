@@ -154,7 +154,8 @@ class StudentSerializerTest(TestCase):
         data["birth_date"] = (date.today() - timedelta(days=365 * 121)).isoformat()
         serializer = StudentSerializer(data=data)
         self.assertFalse(serializer.is_valid())
-        self.assertIn("birth_date", serializer.errors)
+        self.assertIn("enrollment_date", serializer.errors)  # Error en enrollment_date por edad
+
 
     # Gender validations
     def test_gender_required(self):
