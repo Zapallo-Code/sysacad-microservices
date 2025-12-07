@@ -44,7 +44,7 @@ export default function () {
     sleep(0.1);
     
     // Test 2: Listar estudiantes
-    const studentsRes = http.get(`${BASE_URL}/students/`, params);
+    const studentsRes = http.get(`${BASE_URL}/api/v1/students/`, params);
     statusTrend.add(studentsRes.status);
     
     const studentsCheck = check(studentsRes, {
@@ -63,7 +63,7 @@ export default function () {
     sleep(0.1);
     
     // Test 3: Listar tipos de documento
-    const docTypesRes = http.get(`${BASE_URL}/document-types/`, params);
+    const docTypesRes = http.get(`${BASE_URL}/api/v1/document-types/`, params);
     statusTrend.add(docTypesRes.status);
     
     const docTypesCheck = check(docTypesRes, {
@@ -94,7 +94,7 @@ export default function () {
             description: "Documento Nacional de Identidad"
         });
         
-        const createDocTypeRes = http.post(`${BASE_URL}/document-types/`, newDocType, params);
+        const createDocTypeRes = http.post(`${BASE_URL}/api/v1/document-types/`, newDocType, params);
         statusTrend.add(createDocTypeRes.status);
         
         if ([200, 201].includes(createDocTypeRes.status)) {
@@ -118,11 +118,11 @@ export default function () {
             gender: "M",
             student_number: Date.now() + Math.floor(Math.random() * 100000),
             enrollment_date: "2025-01-01",
-            document_type: documentTypeId,
+            document_type_id: documentTypeId,
             specialty_id: 1
         });
         
-        const createRes = http.post(`${BASE_URL}/students/`, newStudent, params);
+        const createRes = http.post(`${BASE_URL}/api/v1/students/`, newStudent, params);
         statusTrend.add(createRes.status);
         
         const createCheck = check(createRes, {
